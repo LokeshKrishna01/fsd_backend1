@@ -408,10 +408,9 @@ project/
 
 ## 🔗 Live Deployment Links
 
-> **Note**: Add your deployment URLs here after deploying
-
-- **Frontend**: `https://your-frontend.onrender.com`
-- **Backend API**: `https://your-backend.onrender.com`
+- **GitHub Repository**: [https://github.com/LokeshKrishna01/fsd_backend1](https://github.com/LokeshKrishna01/fsd_backend1)
+- **Frontend**: `https://your-frontend.onrender.com` (Deploy following instructions above)
+- **Backend API**: `https://your-backend.onrender.com` (Deploy following instructions above)
 
 ## ⚠️ Critical Business Rule
 
