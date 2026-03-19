@@ -27,6 +27,18 @@ router.post('/register', async (req, res) => {
             });
         }
 
+        // Enforce single admin rule
+        const requestedRole = role || 'USER';
+        if (requestedRole === 'ADMIN') {
+            const existingAdmin = await User.findOne({ role: 'ADMIN' });
+            if (existingAdmin) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'An admin already exists. Only one admin is allowed in the system.'
+                });
+            }
+        }
+
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -36,17 +48,23 @@ router.post('/register', async (req, res) => {
             });
         }
 
+        // Determine initial access status:
+        // ADMIN always starts active. Regular USERs start as 'pending' until admin grants access.
+        const initialStatus = requestedRole === 'ADMIN' ? 'active' : 'pending';
+
         // Create user
         const user = await User.create({
             email,
             password,
-            role: role || 'USER',
-            accessStatus: 'active'
+            role: requestedRole,
+            accessStatus: initialStatus
         });
 
         res.status(201).json({
             success: true,
-            message: 'User registered successfully',
+            message: requestedRole === 'ADMIN'
+                ? 'Admin account created successfully. You can login now.'
+                : 'Registration successful! Please wait for the admin to grant you access before logging in.',
             data: {
                 id: user._id,
                 email: user.email,
@@ -97,11 +115,17 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        // Check access status
+        // Check access status - both 'pending' and 'revoked' prevent login
+        if (user.accessStatus === 'pending') {
+            return res.status(403).json({
+                success: false,
+                message: 'Your account is pending approval. Please wait for the admin to grant you access.'
+            });
+        }
         if (user.accessStatus === 'revoked') {
             return res.status(403).json({
                 success: false,
-                message: 'Your access has been revoked. Please contact an administrator.'
+                message: 'Your access has been revoked. Please contact the administrator.'
             });
         }
 

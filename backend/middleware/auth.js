@@ -31,11 +31,17 @@ export const protect = async (req, res, next) => {
             });
         }
 
-        // Check if user's access has been revoked
+        // Check if user's access is blocked (revoked or pending)
         if (user.accessStatus === 'revoked') {
             return res.status(403).json({
                 success: false,
-                message: 'Access revoked. Please contact an administrator.'
+                message: 'Access revoked. Please contact the administrator.'
+            });
+        }
+        if (user.accessStatus === 'pending') {
+            return res.status(403).json({
+                success: false,
+                message: 'Account pending approval. Admin must grant access first.'
             });
         }
 

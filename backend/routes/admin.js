@@ -53,7 +53,8 @@ router.post('/grant-access', async (req, res) => {
             });
         }
 
-        // Update user access status
+        // Update user access status to active (works for both pending and revoked users)
+        const wasStatus = user.accessStatus;
         user.accessStatus = 'active';
         await user.save();
 
@@ -64,12 +65,14 @@ router.post('/grant-access', async (req, res) => {
             action: 'granted',
             performedBy: req.user._id,
             performedByEmail: req.user.email,
-            reason: reason || 'Access granted by admin'
+            reason: reason || (wasStatus === 'pending' ? 'Access approved by admin' : 'Access restored by admin')
         });
 
         res.json({
             success: true,
-            message: 'Access granted successfully',
+            message: wasStatus === 'pending'
+                ? 'Access approved! User can now login.'
+                : 'Access restored successfully.',
             data: {
                 userId: user._id,
                 email: user.email,
