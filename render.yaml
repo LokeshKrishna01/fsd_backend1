@@ -1,8 +1,9 @@
 services:
   # Backend API Service
   - type: web
-    name: access-management-backend
+    name: access-backend
     runtime: node
+    region: oregon
     plan: free
     buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
@@ -20,12 +21,12 @@ services:
       - key: FRONTEND_URL
         fromService:
           type: web
-          name: access-management-frontend
+          name: access-frontend
           property: host
 
   # Frontend Static Site
   - type: web
-    name: access-management-frontend
+    name: access-frontend
     runtime: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
@@ -33,10 +34,9 @@ services:
       - key: VITE_API_URL
         fromService:
           type: web
-          name: access-management-backend
+          name: access-backend
           envVarKey: RENDER_EXTERNAL_URL
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
-

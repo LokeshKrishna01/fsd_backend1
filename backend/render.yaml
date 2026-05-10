@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: access-management-backend
+    name: access-revocation-backend
     env: node
     buildCommand: npm install
     startCommand: npm start
